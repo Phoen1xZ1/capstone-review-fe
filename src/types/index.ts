@@ -14,9 +14,9 @@ export type AvailableSlot = {
   room: string;
 };
 
+/** Team booking — leaderRollNumber thay cho leaderId theo API doc */
 export type TeamBookingRequest = {
-  teamId: number;
-  leaderId: number;
+  leaderRollNumber: string;
   slotIds: number[];
 };
 
@@ -63,3 +63,34 @@ export type ScheduleItem = {
   reviewers: ScheduleLecturer[];
   topics: ScheduleTopic[];
 };
+
+/** Lecturer from GET /api/Lecturer */
+export type Lecturer = {
+  id: number;
+  fullName: string;
+  email: string;
+  minSlot: number;
+  maxSlot: number;
+};
+
+/** Team from GET /api/Team */
+export type Team = {
+  id: number;
+  teamName: string;
+  leaderId: number;
+  leaderRollNumber: string;
+  topicId: number;
+};
+
+/** Auth */
+export type LoginRequest = {
+  email: string;
+  password: string;
+};
+
+export type LoginResponse = {
+  token: string;
+  fullName: string;
+  role: "Moderator" | "Lecturer" | "Student" | string;
+};
+

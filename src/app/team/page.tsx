@@ -21,8 +21,7 @@ function formatTime(iso: string) {
 }
 
 export default function TeamPage() {
-  const [teamId, setTeamId] = useState<number>(1);
-  const [leaderId, setLeaderId] = useState<number>(1);
+  const [leaderId, setLeaderId] = useState<string>("");
   const [selectedSlots, setSelectedSlots] = useState<Set<number>>(new Set());
   const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([]);
 
@@ -56,6 +55,10 @@ export default function TeamPage() {
   }
 
   async function onBookTeam() {
+    if (!leaderId.trim()) {
+      setError(new Error("Vui lòng nhập Mã trưởng nhóm (Mã số sinh viên)."));
+      return;
+    }
     if (selectedSlots.size === 0) {
       setError(new Error("Vui lòng chọn ít nhất một slot trước khi đăng ký."));
       return;
@@ -64,7 +67,7 @@ export default function TeamPage() {
     setError(null);
     setStatus("");
     try {
-      await bookTeam({ teamId, leaderId, slotIds: Array.from(selectedSlots) });
+      await bookTeam({ leaderRollNumber: leaderId, slotIds: Array.from(selectedSlots) });
       setStatus("Đăng ký slot thành công. Hệ thống đã ghi nhận nguyện vọng của nhóm.");
       setSelectedSlots(new Set());
     } catch (err) {
@@ -98,23 +101,13 @@ export default function TeamPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="team-id">Mã nhóm</Label>
-              <Input
-                id="team-id"
-                type="number"
-                min={1}
-                value={teamId}
-                onChange={(e) => setTeamId(Number(e.target.value))}
-              />
-            </div>
-            <div className="space-y-1.5">
-              <Label htmlFor="leader-id">Mã trưởng nhóm</Label>
+              <Label htmlFor="leader-id">Mã trưởng nhóm (MSSV)</Label>
               <Input
                 id="leader-id"
-                type="number"
-                min={1}
+                type="text"
+                placeholder="VD: SE123456"
                 value={leaderId}
-                onChange={(e) => setLeaderId(Number(e.target.value))}
+                onChange={(e) => setLeaderId(e.target.value)}
               />
             </div>
             <div className="pt-1">

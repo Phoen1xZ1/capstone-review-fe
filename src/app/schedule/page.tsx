@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import { ScheduleCalendar } from "@/components/shared/schedule-calendar";
 import { getScheduleByRound } from "@/lib/services";
 import type { ScheduleItem } from "@/types";
 
@@ -117,65 +117,14 @@ export default function SchedulePage() {
               <span className="ml-2 text-sm font-normal text-muted-foreground">({items.length} slot)</span>
             </CardTitle>
           </CardHeader>
-          <CardContent className="p-0">
+          <CardContent className="p-6 pt-0">
             {items.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-12 text-center">
                 <p className="text-sm font-medium text-muted-foreground">Chưa có lịch cho vòng này.</p>
                 <p className="mt-1 text-xs text-muted-foreground">Vòng {reviewRound} chưa được xếp lịch. Quản trị viên cần chạy xếp lịch tự động trước.</p>
               </div>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow className="border-border/60">
-                    <TableHead className="pl-6">Phòng thi</TableHead>
-                    <TableHead>Thời gian</TableHead>
-                    <TableHead>Hội đồng chấm</TableHead>
-                    <TableHead className="pr-6">Nhóm & Đề tài</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {items.map((item) => (
-                    <TableRow key={item.slotId} className="border-border/40">
-                      <TableCell className="pl-6">
-                        <p className="font-semibold">{item.room}</p>
-                        <p className="text-xs text-muted-foreground">Slot #{item.slotId}</p>
-                      </TableCell>
-                      <TableCell>
-                        <p className="text-sm">{formatTime(item.startTime)}</p>
-                        <p className="text-xs text-muted-foreground">đến {formatTime(item.endTime)}</p>
-                      </TableCell>
-                      <TableCell>
-                        <div className="space-y-1">
-                          {item.reviewers.length === 0 ? (
-                            <span className="text-xs text-muted-foreground">Chưa phân công</span>
-                          ) : (
-                            item.reviewers.map((r) => (
-                              <div key={r.lecturerId}>
-                                <p className="text-sm font-medium">{r.fullName}</p>
-                                <p className="text-xs text-muted-foreground">{r.email}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </TableCell>
-                      <TableCell className="pr-6">
-                        <div className="space-y-2">
-                          {item.topics.length === 0 ? (
-                            <span className="text-xs text-muted-foreground">Chưa có nhóm</span>
-                          ) : (
-                            item.topics.map((t) => (
-                              <div key={t.topicId}>
-                                <p className="text-sm font-medium">{t.title}</p>
-                                <p className="text-xs text-muted-foreground">{t.teamName}</p>
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <ScheduleCalendar items={items} reviewRound={reviewRound} />
             )}
           </CardContent>
         </Card>

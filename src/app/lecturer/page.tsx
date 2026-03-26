@@ -6,8 +6,9 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { bookLecturer, getAvailableSlots } from "@/lib/services";
-import type { AvailableSlot } from "@/types";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { bookLecturer, getAvailableSlots, getLecturers } from "@/lib/services";
+import type { AvailableSlot, Lecturer } from "@/types";
 
 function formatTime(iso: string) {
   try {
@@ -24,23 +25,29 @@ export default function LecturerPage() {
   const [lecturerId, setLecturerId] = useState<number>(1);
   const [selectedSlots, setSelectedSlots] = useState<Set<number>>(new Set());
   const [availableSlots, setAvailableSlots] = useState<AvailableSlot[]>([]);
+  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
   const [status, setStatus] = useState("");
   const [error, setError] = useState<unknown>(null);
   const [loading, setLoading] = useState(false);
   const [loadingSlots, setLoadingSlots] = useState(true);
 
   useEffect(() => {
-    async function loadSlots() {
+    async function loadData() {
       try {
-        const response = await getAvailableSlots();
-        setAvailableSlots(response);
+        const [slotsData, lecsData] = await Promise.all([
+          getAvailableSlots(),
+          getLecturers()
+        ]);
+        setAvailableSlots(slotsData);
+        setLecturers(lecsData);
+        if (lecsData.length > 0) setLecturerId(lecsData[0].id);
       } catch (err) {
         setError(err);
       } finally {
         setLoadingSlots(false);
       }
     }
-    loadSlots();
+    loadData();
   }, []);
 
   function toggleSlot(slotId: number) {
@@ -94,14 +101,19 @@ export default function LecturerPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="lecturer-id">Mã giảng viên</Label>
-              <Input
-                id="lecturer-id"
-                type="number"
-                min={1}
-                value={lecturerId}
-                onChange={(e) => setLecturerId(Number(e.target.value))}
-              />
+              <Label htmlFor="lecturer-id">Giảng viên / Hội đồng</Label>
+              <Select value={lecturerId.toString()} onValueChange={(val) => setLecturerId(Number(val))}>
+                <SelectTrigger id="lecturer-id">
+                  <SelectValue placeholder="Chọn giảng viên..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {lecturers.map(l => (
+                    <SelectItem key={l.id} value={l.id.toString()}>
+                      {l.fullName} ({l.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="pt-1">
               <p className="mb-1.5 text-sm font-medium text-foreground">

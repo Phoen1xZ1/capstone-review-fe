@@ -1,12 +1,14 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useEffect, useState } from "react";
 import { ErrorNotice } from "@/components/shared/error-notice";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { autoSchedule, configLecturer, validateManualAssignment } from "@/lib/services";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { autoSchedule, configLecturer, getLecturers, validateManualAssignment } from "@/lib/services";
+import type { Lecturer } from "@/types";
 
 export default function ModeratorPage() {
   const [lecturerId, setLecturerId] = useState<number>(1);
@@ -15,6 +17,23 @@ export default function ModeratorPage() {
   const [reviewRound, setReviewRound] = useState<number>(1);
   const [validateSlotId, setValidateSlotId] = useState<number>(1);
   const [validateLecturerId, setValidateLecturerId] = useState<number>(1);
+  const [lecturers, setLecturers] = useState<Lecturer[]>([]);
+
+  useEffect(() => {
+    async function loadLecs() {
+      try {
+        const data = await getLecturers();
+        setLecturers(data);
+        if (data.length > 0) {
+          setLecturerId(data[0].id);
+          setValidateLecturerId(data[0].id);
+        }
+      } catch (err) {
+        console.error(err);
+      }
+    }
+    loadLecs();
+  }, []);
 
   const [loading, setLoading] = useState(false);
   const [status, setStatus] = useState<string>("");
@@ -89,8 +108,19 @@ export default function ModeratorPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="space-y-1.5">
-              <Label htmlFor="lecturer-id">Mã giảng viên</Label>
-              <Input id="lecturer-id" type="number" min={1} value={lecturerId} onChange={(e) => setLecturerId(Number(e.target.value))} />
+              <Label htmlFor="lecturer-id">Giảng viên / Hội đồng</Label>
+              <Select value={lecturerId.toString()} onValueChange={(val) => setLecturerId(Number(val))}>
+                <SelectTrigger id="lecturer-id">
+                  <SelectValue placeholder="Chọn giảng viên..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {lecturers.map(l => (
+                    <SelectItem key={l.id} value={l.id.toString()}>
+                      {l.fullName} ({l.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <div className="space-y-1.5">
               <Label htmlFor="min-slot">Số slot tối thiểu</Label>
@@ -137,8 +167,19 @@ export default function ModeratorPage() {
               <Input id="validate-slot" type="number" min={1} value={validateSlotId} onChange={(e) => setValidateSlotId(Number(e.target.value))} />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="validate-lecturer">Mã giảng viên</Label>
-              <Input id="validate-lecturer" type="number" min={1} value={validateLecturerId} onChange={(e) => setValidateLecturerId(Number(e.target.value))} />
+              <Label htmlFor="validate-lecturer">Giảng viên / Hội đồng</Label>
+              <Select value={validateLecturerId.toString()} onValueChange={(val) => setValidateLecturerId(Number(val))}>
+                <SelectTrigger id="validate-lecturer">
+                  <SelectValue placeholder="Chọn giảng viên..." />
+                </SelectTrigger>
+                <SelectContent>
+                  {lecturers.map(l => (
+                    <SelectItem key={l.id} value={l.id.toString()}>
+                      {l.fullName} ({l.email})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
             </div>
             <Button disabled={loading} onClick={onValidateAssignment} className="w-full" variant="secondary">
               {loading ? "Đang kiểm tra..." : "Kiểm tra"}
