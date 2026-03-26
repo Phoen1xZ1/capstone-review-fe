@@ -1,0 +1,46 @@
+@import url('https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 34 100% 97%;
+  --foreground: 210 32% 12%;
+  --card: 0 0% 100%;
+  --card-foreground: 210 32% 12%;
+  --popover: 0 0% 100%;
+  --popover-foreground: 210 32% 12%;
+  --primary: 18 89% 54%;
+  --primary-foreground: 40 100% 98%;
+  --secondary: 35 82% 92%;
+  --secondary-foreground: 210 32% 12%;
+  --muted: 35 60% 94%;
+  --muted-foreground: 210 16% 38%;
+  --accent: 191 73% 92%;
+  --accent-foreground: 205 70% 22%;
+  --destructive: 0 82% 55%;
+  --destructive-foreground: 210 40% 98%;
+  --border: 34 34% 84%;
+  --input: 34 34% 84%;
+  --ring: 18 89% 54%;
+  --radius: 0.75rem;
+}
+
+* {
+  @apply border-border;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-background text-foreground antialiased;
+  font-family: 'Geist', system-ui, sans-serif;
+  min-height: 100dvh;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255, 208, 145, 0.45), transparent 40%),
+    radial-gradient(circle at 90% 0%, rgba(147, 222, 255, 0.35), transparent 28%),
+    linear-gradient(180deg, rgba(255, 246, 233, 0.8), rgba(254, 252, 248, 0.95));
+}
